@@ -26,6 +26,8 @@ public class vehiclescript : MonoBehaviour
         gamePlay.Button1.onClick.AddListener(SwitchControls);
         gamePlay.ExitBtn.onClick.AddListener(CarToTps);
         TPSChar = FindObjectOfType<BasicBehaviour>();
+
+        spawnPoint = transform.Find("spawnPoint");
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -46,12 +48,13 @@ public class vehiclescript : MonoBehaviour
         gamePlay.trafficObject.transform.localPosition = Vector3.zero;
         gamePlay.trafficObject.transform.localRotation = Quaternion.identity;
 
-        gamePlay.ThirdPersonCntrol.transform.position = spawnPoint.position;
-        gamePlay.ThirdPersonCntrol.transform.rotation = spawnPoint.rotation;
 
         gamePlay.ThirdPersonCntrol.SetActive(true);
 
         TPSChar = FindObjectOfType<BasicBehaviour>();
+
+        TPSChar.transform.position = spawnPoint.position;
+        TPSChar.transform.rotation = spawnPoint.rotation;
 
         this.GetComponent<RCC_CarControllerV3>().enabled = false;
         this.GetComponent<Rigidbody>().isKinematic = true;
