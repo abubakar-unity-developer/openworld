@@ -105,23 +105,35 @@ public class vehiclescript : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 gamePlay.ThirdPersonCntrol.SetActive(false);
 
-                CollidedCar.GetComponent<RCC_CarControllerV3>().enabled = true;
+                var RccScript = CollidedCar.GetComponent<RCC_CarControllerV3>();
 
-                CollidedCar.GetComponent<Rigidbody>().isKinematic = false;
-                CollidedCar.GetComponent<RCC_CarControllerV3>().StartEngine();
-
-                gamePlay.trafficObject.transform.SetParent(CollidedCar.transform);
-                gamePlay.trafficObject.transform.localPosition = Vector3.zero;
-                gamePlay.trafficObject.transform.localRotation = Quaternion.identity;
-
-                CollidedCar.transform.GetChild(1).gameObject.SetActive(false);
-
-                foreach (GameObject carControls in gamePlay.RCCControls)
+                if (RccScript != null)
                 {
-                    carControls.SetActive(true);
-                }
+                    RccScript.enabled = true;
+                    CollidedCar.GetComponent<Rigidbody>().isKinematic = false;
+                    CollidedCar.GetComponent<RCC_CarControllerV3>().StartEngine();
+                    gamePlay.trafficObject.transform.SetParent(CollidedCar.transform);
+                    gamePlay.trafficObject.transform.localPosition = Vector3.zero;
+                    gamePlay.trafficObject.transform.localRotation = Quaternion.identity;
 
-                cam = RCC_SceneManager.Instance.activePlayerCamera;
+                    CollidedCar.transform.GetChild(1).gameObject.SetActive(false);
+
+                    foreach (GameObject carControls in gamePlay.RCCControls)
+                    {
+                        carControls.SetActive(true);
+                    }
+
+                    cam = RCC_SceneManager.Instance.activePlayerCamera;
+                }
+                else
+                {
+                    CollidedCar.GetComponent<BikeControl>().enabled = true;
+                    gamePlay.BikeCamera.GetComponent<BikeCamera>().target = CollidedCar.transform;
+                    gamePlay.BikeCamera.GetComponent<BikeCamera>().BikerMan = CollidedCar.transform.Find("Player");
+
+                    gamePlay.BikeCamera.SetActive(true);
+                    gamePlay.BikeControl.SetActive(true);
+                }
 
                 CollidedCar.AddComponent<vehiclescript>();
 
