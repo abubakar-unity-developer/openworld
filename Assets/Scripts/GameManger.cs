@@ -10,7 +10,9 @@ public class GameManger : MonoBehaviour
     public GameObject blackScreen;
 
     [Header("UI Buttons")]
-    public Button Button1, ExitBtn, ExitBike;
+    public Button Button1;
+    public Button ExitBtn;
+    public Button ExitBike;
 
     [Header("Controls / UI")]
     public GameObject RccControl;

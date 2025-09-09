@@ -56,10 +56,23 @@ public class vehiclescript : MonoBehaviour
         TPSChar.transform.position = spawnPoint.position;
         TPSChar.transform.rotation = spawnPoint.rotation;
 
-        this.GetComponent<RCC_CarControllerV3>().enabled = false;
-        this.GetComponent<Rigidbody>().isKinematic = true;
-        this.GetComponent<RCC_CarControllerV3>().KillEngine();
-        this.transform.GetChild(1).gameObject.SetActive(true);
+        //if (currentVehicle == vehicleType.Bike)
+        //{
+        //    this.GetComponent<BikeControl>().enabled = false;
+        //    gamePlay.BikeCamera.SetActive(false);
+        //    gamePlay.BikeControl.SetActive(false);
+        //}
+        //else if (currentVehicle == vehicleType.RccCars)
+        //{
+        //    this.GetComponent<RCC_CarControllerV3>().enabled = false;
+        //    this.GetComponent<Rigidbody>().isKinematic = true;
+        //    this.GetComponent<RCC_CarControllerV3>().KillEngine();
+        //    this.transform.GetChild(1).gameObject.SetActive(true);
+        //}
+        //else
+        //{
+        //    Debug.Log("no condition");
+        //}
 
         TPSChar.gameObject.AddComponent<vehiclescript>();
         TPSChar.gameObject.GetComponent<vehiclescript>().currentVehicle = vehicleType.Thirdperson;
@@ -97,45 +110,18 @@ public class vehiclescript : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 gamePlay.Button1.gameObject.SetActive(false);
                 gamePlay.ExitBtn.gameObject.SetActive(false);
+                ChangeEnum();
+
+
                 break;
 
             case vehicleType.Thirdperson:
-                Debug.LogError("third person case run");
-
                 yield return new WaitForSeconds(1f);
                 gamePlay.ThirdPersonCntrol.SetActive(false);
 
-                var RccScript = CollidedCar.GetComponent<RCC_CarControllerV3>();
+                ChangeEnum();
 
-                if (RccScript != null)
-                {
-                    RccScript.enabled = true;
-                    CollidedCar.GetComponent<Rigidbody>().isKinematic = false;
-                    CollidedCar.GetComponent<RCC_CarControllerV3>().StartEngine();
-                    gamePlay.trafficObject.transform.SetParent(CollidedCar.transform);
-                    gamePlay.trafficObject.transform.localPosition = Vector3.zero;
-                    gamePlay.trafficObject.transform.localRotation = Quaternion.identity;
 
-                    CollidedCar.transform.GetChild(1).gameObject.SetActive(false);
-
-                    foreach (GameObject carControls in gamePlay.RCCControls)
-                    {
-                        carControls.SetActive(true);
-                    }
-
-                    cam = RCC_SceneManager.Instance.activePlayerCamera;
-                }
-                else
-                {
-                    CollidedCar.GetComponent<BikeControl>().enabled = true;
-                    gamePlay.BikeCamera.GetComponent<BikeCamera>().target = CollidedCar.transform;
-                    gamePlay.BikeCamera.GetComponent<BikeCamera>().BikerMan = CollidedCar.transform.Find("Player");
-
-                    gamePlay.BikeCamera.SetActive(true);
-                    gamePlay.BikeControl.SetActive(true);
-                }
-
-                CollidedCar.AddComponent<vehiclescript>();
 
                 gamePlay.Button1.gameObject.SetActive(false);
                 gamePlay.ExitBtn.gameObject.SetActive(true);
@@ -146,13 +132,10 @@ public class vehiclescript : MonoBehaviour
                 break;
 
             case vehicleType.Bike:
+                gamePlay.BikeControl.SetActive(false);
+                gamePlay.BikeCamera.SetActive(false);
 
-                Debug.LogError("bike Detuction");
-
-                gamePlay.BikeControl.SetActive(true);
-                gamePlay.BikeCamera.SetActive(true);
-
-                CollidedCar.GetComponent<BikeControl>().enabled = true;
+                CollidedCar.GetComponent<BikeControl>().enabled = false;
 
                 gamePlay.ThirdPersonCntrol.SetActive(false);
 
@@ -163,6 +146,53 @@ public class vehiclescript : MonoBehaviour
                 gamePlay.Button1.gameObject.SetActive(false);
                 gamePlay.ExitBike.gameObject.SetActive(true);
                 break;
+        }
+    }
+    private void ChangeEnum()
+    {
+        var RccScript = CollidedCar.GetComponent<RCC_CarControllerV3>();
+        var BikeScript = CollidedCar.GetComponent<BikeControl>();
+        var TPSScript = CollidedCar.GetComponent<BasicBehaviour>();
+
+
+        if (RccScript != null)
+        {
+            RccScript.enabled = true;
+            CollidedCar.GetComponent<Rigidbody>().isKinematic = false;
+            CollidedCar.GetComponent<RCC_CarControllerV3>().StartEngine();
+            gamePlay.trafficObject.transform.SetParent(CollidedCar.transform);
+            gamePlay.trafficObject.transform.localPosition = Vector3.zero;
+            gamePlay.trafficObject.transform.localRotation = Quaternion.identity;
+
+            CollidedCar.transform.GetChild(1).gameObject.SetActive(false);
+
+            foreach (GameObject carControls in gamePlay.RCCControls)
+            {
+                carControls.SetActive(true);
+            }
+
+            RCC_Camera cam = RCC_SceneManager.Instance.activePlayerCamera;
+            CollidedCar.AddComponent<vehiclescript>();
+
+           CollidedCar.GetComponent<vehiclescript>().currentVehicle = vehicleType.RccCars;
+            
+        }
+        else if (BikeScript != null)
+        {
+            CollidedCar.GetComponent<BikeControl>().enabled = true;
+            gamePlay.BikeCamera.GetComponent<BikeCamera>().target = CollidedCar.transform;
+            gamePlay.BikeCamera.GetComponent<BikeCamera>().BikerMan = CollidedCar.transform.Find("Player");
+
+            gamePlay.BikeCamera.SetActive(true);
+            gamePlay.BikeControl.SetActive(true);
+
+            CollidedCar.AddComponent<vehiclescript>();
+
+           CollidedCar.GetComponent<vehiclescript>().currentVehicle = vehicleType.Bike;
+        }
+        else
+        {
+            currentVehicle = vehicleType.Other;
         }
     }
 }
